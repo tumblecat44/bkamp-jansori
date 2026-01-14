@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PushPermissionButton } from "@/components/push/push-permission-button";
-import { GoalList } from "@/components/goals/goal-list";
+import { GoalList } from "./goal-list";
 
 export default async function HomePage() {
   const session = await auth();
