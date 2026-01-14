@@ -26,7 +26,7 @@ ${INTENSITY_PROMPTS[intensity]}
 
   try {
     const response = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model: "qwen/qwen-3-32b",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
