@@ -26,7 +26,7 @@ ${INTENSITY_PROMPTS[intensity]}
 
   try {
     const response = await groq.chat.completions.create({
-      model: "qwen/qwen-3-32b",
+      model: "moonshotai/kimi-k2-instruct-0905",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
@@ -35,10 +35,13 @@ ${INTENSITY_PROMPTS[intensity]}
       temperature: 0.8,
     });
 
-    return (
-      response.choices[0]?.message?.content?.trim() ||
-      "오늘 목표 달성했어? 안 했으면 지금이라도 해."
-    );
+    let content = response.choices[0]?.message?.content?.trim() ||
+      "오늘 목표 달성했어? 안 했으면 지금이라도 해.";
+
+    // Qwen3의 <think> 태그 제거
+    content = content.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+
+    return content;
   } catch (error) {
     console.error("Groq API error:", error);
     return "오늘 목표 달성했어? 안 했으면 지금이라도 해.";
