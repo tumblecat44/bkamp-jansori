@@ -50,8 +50,13 @@ export async function POST(request: Request) {
 
   const results = [];
 
+  console.log("=== 푸시 테스트 시작 ===");
+  console.log("구독 수:", subscriptions.length);
+
   // 모든 구독 기기에 전송
   for (const subscription of subscriptions) {
+    console.log("전송 시도:", subscription.endpoint.slice(0, 50) + "...");
+
     const result = await sendPushNotification(
       {
         endpoint: subscription.endpoint,
@@ -64,11 +69,16 @@ export async function POST(request: Request) {
       message
     );
 
+    console.log("전송 결과:", result);
+
     results.push({
       subscriptionId: subscription.id,
       success: result.success,
+      error: result.error ? String(result.error) : undefined,
     });
   }
+
+  console.log("=== 푸시 테스트 완료 ===");
 
   return NextResponse.json({
     message: "테스트 알림 전송 완료",

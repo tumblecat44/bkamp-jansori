@@ -6,14 +6,26 @@ import { Button } from "@/components/ui/button";
 export function PushPermissionButton() {
   const [permission, setPermission] = useState<NotificationPermission | "loading">("loading");
   const [isSubscribing, setIsSubscribing] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   useEffect(() => {
     if ("Notification" in window) {
       setPermission(Notification.permission);
+      checkSubscription();
     } else {
       setPermission("denied");
     }
   }, []);
+
+  const checkSubscription = async () => {
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+      setIsSubscribed(!!subscription);
+    } catch {
+      setIsSubscribed(false);
+    }
+  };
 
   const handleSubscribe = async () => {
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
@@ -57,7 +69,8 @@ export function PushPermissionButton() {
       });
 
       if (response.ok) {
-        alert("알림이 활성화되었습니다! 🎉");
+        setIsSubscribed(true);
+        alert("알림이 활성화되었습니다!");
       } else {
         throw new Error("Failed to save subscription");
       }
@@ -69,16 +82,46 @@ export function PushPermissionButton() {
     }
   };
 
+  const handleUnsubscribe = async () => {
+    setIsSubscribing(true);
+
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+
+      if (subscription) {
+        await subscription.unsubscribe();
+      }
+
+      // 서버에서도 삭제
+      await fetch("/api/push/unsubscribe", {
+        method: "POST",
+      });
+
+      setIsSubscribed(false);
+      alert("알림이 해제되었습니다. 다시 등록하세요!");
+    } catch (error) {
+      console.error("Unsubscribe error:", error);
+      alert("알림 해제 중 오류가 발생했습니다.");
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
+
   if (permission === "loading") {
     return null;
   }
 
-  if (permission === "granted") {
+  if (permission === "granted" && isSubscribed) {
     return (
-      <div className="flex items-center gap-2 text-sm text-green-600">
-        <span>✓</span>
-        <span>알림 활성화됨</span>
-      </div>
+      <Button
+        onClick={handleUnsubscribe}
+        disabled={isSubscribing}
+        variant="outline"
+        size="sm"
+      >
+        {isSubscribing ? "처리 중..." : "🔕 알림 해제"}
+      </Button>
     );
   }
 
@@ -91,7 +134,7 @@ export function PushPermissionButton() {
       {isSubscribing
         ? "설정 중..."
         : permission === "denied"
-        ? "알림이 차단됨 (브라우저 설정에서 변경)"
+        ? "알림이 차단됨"
         : "🔔 알림 받기"}
     </Button>
   );

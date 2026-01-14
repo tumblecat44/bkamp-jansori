@@ -19,26 +19,19 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // 기존 구독이 있으면 업데이트, 없으면 생성
-  const existing = await db.pushSubscription.findFirst({
-    where: { userId: session.user.id, endpoint },
+  // 기존 구독 모두 삭제하고 새로 생성 (endpoint가 변경되면 이전 것은 무효화됨)
+  await db.pushSubscription.deleteMany({
+    where: { userId: session.user.id },
   });
 
-  if (existing) {
-    await db.pushSubscription.update({
-      where: { id: existing.id },
-      data: { p256dh, auth: authKey },
-    });
-  } else {
-    await db.pushSubscription.create({
-      data: {
-        userId: session.user.id,
-        endpoint,
-        p256dh,
-        auth: authKey,
-      },
-    });
-  }
+  await db.pushSubscription.create({
+    data: {
+      userId: session.user.id,
+      endpoint,
+      p256dh,
+      auth: authKey,
+    },
+  });
 
   return NextResponse.json({ success: true });
 }

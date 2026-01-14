@@ -2,30 +2,34 @@
 self.addEventListener("push", function (event) {
   if (!event.data) return;
 
-  const data = event.data.json();
+  let title = "잔소리 도착";
+  let body = "";
+
+  try {
+    // JSON 형식이면 파싱
+    const data = event.data.json();
+    title = data.title || title;
+    body = data.body || "";
+  } catch (e) {
+    // JSON이 아니면 텍스트로 처리
+    body = event.data.text();
+  }
+
   const options = {
-    body: data.body,
-    icon: data.icon || "/icon-192.png",
-    badge: data.badge || "/badge-72.png",
+    body: body,
     vibrate: [100, 50, 100],
     data: {
-      url: data.url || "/",
+      url: "/",
     },
-    actions: [
-      { action: "open", title: "확인하기" },
-      { action: "close", title: "닫기" },
-    ],
   };
 
   event.waitUntil(
-    self.registration.showNotification(data.title || "잔소리 도착", options)
+    self.registration.showNotification(title, options)
   );
 });
 
 self.addEventListener("notificationclick", function (event) {
   event.notification.close();
-
-  if (event.action === "close") return;
 
   event.waitUntil(
     clients.matchAll({ type: "window" }).then(function (clientList) {
