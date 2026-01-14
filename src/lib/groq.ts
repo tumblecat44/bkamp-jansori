@@ -17,7 +17,8 @@ export async function generateJansori(
   const systemPrompt = `당신은 사용자의 친한 친구입니다. 사용자가 목표를 달성하도록 잔소리를 해줍니다.
 ${INTENSITY_PROMPTS[intensity]}
 반드시 반말로 말하고, 자연스러운 한국어로 한 문장만 말해주세요.
-이모지는 사용하지 마세요.`;
+이모지는 사용하지 마세요.
+무조건 한글과 아라비아 숫자(1, 2, 3)만 사용하세요. 한자, 일본어, 영어, 중국어 등 다른 언어는 절대 사용하지 마세요.`;
 
   const userPrompt = `사용자의 목표: "${goal}"
 
