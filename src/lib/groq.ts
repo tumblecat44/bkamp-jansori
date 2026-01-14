@@ -20,7 +20,17 @@ ${INTENSITY_PROMPTS[intensity]}
 이모지는 사용하지 마세요.
 무조건 한글과 아라비아 숫자(1, 2, 3)만 사용하세요. 한자, 일본어, 영어, 중국어 등 다른 언어는 절대 사용하지 마세요.`;
 
-  const userPrompt = `사용자의 목표: "${goal}"
+  // 현재 시간 (KST)
+  const now = new Date();
+  const kstTime = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: false,
+  }).format(now);
+
+  const userPrompt = `현재 시간: ${kstTime}
+사용자의 목표: "${goal}"
 
 이 목표에 대해 잔소리를 한 문장으로 해주세요.`;
 
