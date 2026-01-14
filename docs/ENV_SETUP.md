@@ -24,7 +24,7 @@ DATABASE_URL="postgresql://[user]:[password]@[host]/[database]?sslmode=require"
 
 ### 예시
 ```
-DATABASE_URL="postgresql://jansori_owner:AbC123xYz@ep-cool-sunset-123456.ap-southeast-1.aws.neon.tech/jansoridb?sslmode=require"
+DATABASE_URL="postgresql://your-user:your-password@ep-xxxxx-xxxxx-123456.ap-southeast-1.aws.neon.tech/your-database?sslmode=require"
 ```
 
 ---
@@ -157,22 +157,22 @@ VAPID_SUBJECT="mailto:your-email@example.com"
 
 ```env
 # Database (Neon Postgres)
-DATABASE_URL="postgresql://jansori_owner:password123@ep-cool-sunset-123456.ap-southeast-1.aws.neon.tech/jansoridb?sslmode=require"
+DATABASE_URL="postgresql://your-user:your-password@your-host.neon.tech/your-database?sslmode=require"
 
 # Auth.js
 NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="K7xJ3mN9pQ2rS5tU8vW1yZ4bC6dE0fG3hI6jL9mN2oP5"
+NEXTAUTH_SECRET="generate-with-openssl-rand-base64-32"
 
 # Google OAuth
-GOOGLE_CLIENT_ID="123456789-abcdefghijk.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET="GOCSPX-AbCdEfGhIjKlMnOpQrStUvWxYz"
+GOOGLE_CLIENT_ID="your-client-id.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET="your-client-secret"
 
 # Groq AI
-GROQ_API_KEY="gsk_ABCDefghIJKLmnopQRSTuvwxYZ1234567890abcdefgh"
+GROQ_API_KEY="gsk_your-api-key"
 
 # Web Push VAPID Keys
-NEXT_PUBLIC_VAPID_PUBLIC_KEY="BEl62iUYgUivnuBSmtJuC7xwuYPVLON..."
-VAPID_PRIVATE_KEY="_8zNYs5wRo3hE8cF..."
+NEXT_PUBLIC_VAPID_PUBLIC_KEY="your-public-key"
+VAPID_PRIVATE_KEY="your-private-key"
 VAPID_SUBJECT="mailto:your-email@example.com"
 ```
 
