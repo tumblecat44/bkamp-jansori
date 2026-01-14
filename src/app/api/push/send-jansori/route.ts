@@ -19,12 +19,18 @@ function getCurrentHour(timezone: string): number {
 function getNotificationHours(startHour: number, endHour: number, frequency: number): number[] {
   if (frequency === 1) return [startHour];
 
-  const range = endHour - startHour;
+  // 자정을 넘어가는 경우 처리 (예: 21시~1시)
+  const range = endHour >= startHour
+    ? endHour - startHour
+    : (24 - startHour) + endHour;
+
   const interval = range / (frequency - 1);
 
   const hours: number[] = [];
   for (let i = 0; i < frequency; i++) {
-    hours.push(Math.round(startHour + interval * i));
+    let hour = Math.round(startHour + interval * i);
+    if (hour >= 24) hour -= 24;
+    hours.push(hour);
   }
   return hours;
 }
