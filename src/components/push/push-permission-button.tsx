@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 export function PushPermissionButton() {
   const [permission, setPermission] = useState<NotificationPermission | "loading">("loading");
   const [isSubscribing, setIsSubscribing] = useState(false);
-  const [isTesting, setIsTesting] = useState(false);
 
   useEffect(() => {
     if ("Notification" in window) {
@@ -70,44 +69,15 @@ export function PushPermissionButton() {
     }
   };
 
-  const handleTest = async () => {
-    setIsTesting(true);
-    try {
-      const response = await fetch("/api/push/test", { method: "POST" });
-      const data = await response.json();
-
-      if (response.ok) {
-        alert(`테스트 알림 전송 완료!\n\n잔소리: "${data.jansori}"`);
-      } else {
-        alert(data.error || "테스트 실패");
-      }
-    } catch (error) {
-      console.error("Test error:", error);
-      alert("테스트 중 오류가 발생했습니다.");
-    } finally {
-      setIsTesting(false);
-    }
-  };
-
   if (permission === "loading") {
     return null;
   }
 
   if (permission === "granted") {
     return (
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 text-sm text-green-600">
-          <span>✓</span>
-          <span>알림 활성화됨</span>
-        </div>
-        <Button
-          onClick={handleTest}
-          disabled={isTesting}
-          variant="outline"
-          size="sm"
-        >
-          {isTesting ? "전송 중..." : "🧪 테스트"}
-        </Button>
+      <div className="flex items-center gap-2 text-sm text-green-600">
+        <span>✓</span>
+        <span>알림 활성화됨</span>
       </div>
     );
   }

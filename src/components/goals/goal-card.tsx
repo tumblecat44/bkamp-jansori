@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,30 @@ const INTENSITY_LABELS = {
 
 export function GoalCard({ goal, onToggle, onDelete }: GoalCardProps) {
   const intensity = INTENSITY_LABELS[goal.intensity as 1 | 2 | 3] || INTENSITY_LABELS[2];
+  const [isTesting, setIsTesting] = useState(false);
+
+  const handleTest = async () => {
+    setIsTesting(true);
+    try {
+      const response = await fetch("/api/push/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ goalId: goal.id }),
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(`잔소리 전송 완료!\n\n"${data.jansori}"`);
+      } else {
+        alert(data.error || "테스트 실패");
+      }
+    } catch (error) {
+      console.error("Test error:", error);
+      alert("테스트 중 오류가 발생했습니다.");
+    } finally {
+      setIsTesting(false);
+    }
+  };
 
   return (
     <Card className={`transition-opacity ${!goal.isActive ? "opacity-50" : ""}`}>
@@ -56,6 +81,14 @@ export function GoalCard({ goal, onToggle, onDelete }: GoalCardProps) {
           </span>
         </div>
         <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleTest}
+            disabled={isTesting}
+          >
+            {isTesting ? "..." : "테스트"}
+          </Button>
           <Button asChild variant="outline" size="sm" className="flex-1">
             <Link href={`/goals/${goal.id}`}>수정</Link>
           </Button>

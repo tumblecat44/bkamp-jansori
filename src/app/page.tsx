@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PushPermissionButton } from "@/components/push/push-permission-button";
 import { GoalList } from "@/components/goals/goal-list";
+import { TimezoneSelector } from "@/components/settings/timezone-selector";
 
 export default async function HomePage() {
   const session = await auth();
@@ -13,10 +14,16 @@ export default async function HomePage() {
     redirect("/login");
   }
 
-  const goals = await db.goal.findMany({
-    where: { userId: session.user.id },
-    orderBy: { createdAt: "desc" },
-  });
+  const [goals, user] = await Promise.all([
+    db.goal.findMany({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: "desc" },
+    }),
+    db.user.findUnique({
+      where: { id: session.user.id },
+      select: { timezone: true },
+    }),
+  ]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
@@ -25,6 +32,7 @@ export default async function HomePage() {
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-xl font-bold">🗣️ 잔소리 AI</h1>
           <div className="flex items-center gap-4">
+            <TimezoneSelector initialTimezone={user?.timezone || "Asia/Seoul"} />
             <span className="text-sm text-muted-foreground hidden sm:block">
               {session.user.name}
             </span>

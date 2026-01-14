@@ -5,7 +5,7 @@ import { sendPushNotification } from "@/lib/push";
 import { generateJansori } from "@/lib/groq";
 
 // 테스트용 - 즉시 푸시 알림 전송
-export async function POST() {
+export async function POST(request: Request) {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -24,11 +24,24 @@ export async function POST() {
     );
   }
 
-  // 사용자의 첫 번째 목표 가져오기 (있으면)
-  const goal = await db.goal.findFirst({
-    where: { userId: session.user.id },
-    orderBy: { createdAt: "desc" },
-  });
+  // 요청에서 goalId 가져오기
+  let goalId: string | undefined;
+  try {
+    const body = await request.json();
+    goalId = body.goalId;
+  } catch {
+    // body가 없을 수 있음
+  }
+
+  // 특정 목표 또는 첫 번째 목표 가져오기
+  const goal = goalId
+    ? await db.goal.findFirst({
+        where: { id: goalId, userId: session.user.id },
+      })
+    : await db.goal.findFirst({
+        where: { userId: session.user.id },
+        orderBy: { createdAt: "desc" },
+      });
 
   // 잔소리 생성
   const message = goal
