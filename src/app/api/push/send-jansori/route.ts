@@ -15,6 +15,20 @@ function getCurrentHour(timezone: string): number {
   return hour;
 }
 
+// 알림 보낼 시간 목록 계산 (처음, 중간, 끝 균등 분배)
+function getNotificationHours(startHour: number, endHour: number, frequency: number): number[] {
+  if (frequency === 1) return [startHour];
+
+  const range = endHour - startHour;
+  const interval = range / (frequency - 1);
+
+  const hours: number[] = [];
+  for (let i = 0; i < frequency; i++) {
+    hours.push(Math.round(startHour + interval * i));
+  }
+  return hours;
+}
+
 // GitHub Actions Cron에서 호출됨
 export async function GET(request: NextRequest) {
   // 인증 확인
@@ -48,18 +62,9 @@ export async function GET(request: NextRequest) {
     const userTimezone = goal.user.timezone || "Asia/Seoul";
     const currentHour = getCurrentHour(userTimezone);
 
-    // 현재 시간이 목표의 시작~종료 시간 사이인지 확인
-    if (currentHour < goal.startHour || currentHour > goal.endHour) {
-      continue;
-    }
-
-    // 하루 잔소리 횟수에 따라 이 시간에 보낼지 결정
-    const hoursActive = goal.endHour - goal.startHour;
-    const interval = Math.floor(hoursActive / goal.frequency);
-    const hoursFromStart = currentHour - goal.startHour;
-
-    // 이 시간이 잔소리 보낼 시간인지 확인
-    if (interval > 0 && hoursFromStart % interval !== 0) {
+    // 이 시간에 알림 보낼지 확인
+    const notificationHours = getNotificationHours(goal.startHour, goal.endHour, goal.frequency);
+    if (!notificationHours.includes(currentHour)) {
       continue;
     }
 
